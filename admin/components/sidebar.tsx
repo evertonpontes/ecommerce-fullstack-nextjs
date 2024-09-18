@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import {
   LayoutDashboard,
   Tag,
@@ -72,7 +78,8 @@ export default function Sidebar() {
     return (
       <div className="flex h-full w-full flex-col bg-background">
         <div className="p-6">
-          <h2 className="text-lg font-semibold">Dashboard</h2>
+          <SheetTitle>Dashboard</SheetTitle>
+          <SheetDescription>E-commerce Admin</SheetDescription>
         </div>
         <ScrollArea className="flex-1">
           <nav className="flex flex-col gap-2 p-4">
