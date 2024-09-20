@@ -26,21 +26,27 @@ import {
 
 import React, { useState, useTransition } from 'react';
 import { Textarea } from '@/components/ui/textarea';
-import { Category } from '@prisma/client';
+import { Attributes, Category } from '@prisma/client';
 import { Plus, Trash } from 'lucide-react';
 import { UploadImage } from '@/components/ui/upload-image';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface CategoryFormProps {
   categories: Category[];
+  data:
+    | ({
+        attributes: Attributes[];
+      } & Category)
+    | null;
 }
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
   description: z.string().min(2).max(500),
   imageUrl: z.string(),
-  parentId: z.string(),
+  parentId: z.string().nullable(),
   attributes: z
     .object({
       name: z.string().min(2).max(50),
@@ -48,15 +54,18 @@ const formSchema = z.object({
     .array(),
 });
 
-export const CategoryForm: React.FC<CategoryFormProps> = ({ categories }) => {
+export const CategoryForm: React.FC<CategoryFormProps> = ({
+  categories,
+  data,
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      imageUrl: '',
-      parentId: '',
-      attributes: [{ name: '' }],
+      name: data ? data.name : '',
+      description: data ? data.description : '',
+      imageUrl: data ? data.imageUrl : '',
+      parentId: data ? data.parentId : '',
+      attributes: data ? data.attributes : [{ name: '' }],
     },
   });
 
@@ -68,15 +77,25 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ categories }) => {
 
   const router = useRouter();
 
+  const toastMessage = data
+    ? 'Category Updated Successfully!'
+    : 'Category Created Successfully!';
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
       try {
-        await axios.post<Category>('/api/categories', values);
+        if (data) {
+          await axios.put<Category>(`/api/categories/${data.id}`, values);
+        } else {
+          await axios.post<Category>('/api/categories', values);
+        }
 
         router.refresh();
         router.push('/categories');
+        toast.success(toastMessage);
       } catch (error) {
         console.log(error);
+        toast.error('Something went wrong :(');
       }
     });
   }
@@ -160,7 +179,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ categories }) => {
               <FormLabel>Parent Category</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value || ''}
                 disabled={isPending}
               >
                 <FormControl>
@@ -170,7 +189,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ categories }) => {
                 </FormControl>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
+                    <SelectItem
+                      disabled={category.id === data?.id}
+                      key={category.id}
+                      value={category.id}
+                    >
                       {category.name}
                     </SelectItem>
                   ))}

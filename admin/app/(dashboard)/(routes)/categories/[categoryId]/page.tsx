@@ -10,7 +10,6 @@ const CategoryPage = async ({ params }: { params: { categoryId: string } }) => {
     },
     include: {
       attributes: true,
-      parent: true,
     },
   });
 
@@ -27,7 +26,7 @@ const CategoryPage = async ({ params }: { params: { categoryId: string } }) => {
   return (
     <div className="space-y-4 px-8 pb-4">
       <PageHeader title={data.title} description={data.description} />
-      <CategoryForm categories={categories} />
+      <CategoryForm categories={categories} data={category} />
     </div>
   );
 };

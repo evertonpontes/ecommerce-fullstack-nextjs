@@ -2,8 +2,15 @@ import { auth } from '@/auth';
 import { prisma } from '@/prisma';
 import { NextResponse } from 'next/server';
 
-export async function POST(req: Request) {
+export async function PUT(
+  req: Request,
+  { params }: { params: { categoryId: string } }
+) {
   try {
+    if (!params.categoryId) {
+      return new NextResponse('Category Id is required', { status: 400 });
+    }
+
     const session = await auth();
     const body = await req.json();
     const { name, imageUrl, parentId, description, attributes } = body;
@@ -20,13 +27,19 @@ export async function POST(req: Request) {
       return new NextResponse('Description is required', { status: 400 });
     }
 
-    const category = await prisma.category.create({
+    const category = await prisma.category.update({
+      where: {
+        id: params.categoryId,
+      },
       data: {
         name,
         imageUrl,
         parentId: parentId || undefined,
         description,
         attributes: {
+          deleteMany: {
+            categoryId: params.categoryId,
+          },
           createMany: {
             data: [...attributes.map((attr: { name: string }) => attr)],
           },
@@ -36,24 +49,35 @@ export async function POST(req: Request) {
 
     return NextResponse.json(category);
   } catch (error) {
-    console.log('[CATEGORIES_POST]', error);
+    console.log('[CATEGORIES_PUT]', error);
     return new NextResponse('Internal error', { status: 500 });
   }
 }
 
-export async function GET(req: Request) {
+export async function DELETE(
+  req: Request,
+  { params }: { params: { categoryId: string } }
+) {
   try {
-    const categories = await prisma.category.findMany({
-      include: {
-        childrens: true,
-        attributes: true,
-        parent: true,
+    if (!params.categoryId) {
+      return new NextResponse('Category Id is required', { status: 400 });
+    }
+
+    const session = await auth();
+
+    if (!session || !session.user) {
+      return new NextResponse('Unauthenticated', { status: 401 });
+    }
+
+    const category = await prisma.category.delete({
+      where: {
+        id: params.categoryId,
       },
     });
 
-    return NextResponse.json(categories);
+    return NextResponse.json(category);
   } catch (error) {
-    console.log('[CATEGORIES_GET]', error);
+    console.log('[CATEGORIES_DELETE]', error);
     return new NextResponse('Internal error', { status: 500 });
   }
 }

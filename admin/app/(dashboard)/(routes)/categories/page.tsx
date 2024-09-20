@@ -31,7 +31,7 @@ const CategoriesPage = async () => {
         </Link>
       </div>
       <div className="max-w-screen-xl mx-auto px-8">
-        <DataTable columns={Columns} data={categories} />
+        <DataTable columns={Columns} data={categories} filter="name" />
       </div>
     </div>
   );
