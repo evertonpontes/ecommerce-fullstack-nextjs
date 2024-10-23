@@ -22,6 +22,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -65,9 +67,16 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header, index) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        (index >= 0 && index <= 1) || header.id === 'createdAt'
+                          ? ''
+                          : 'hidden md:table-cell'
+                      )}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -87,8 +96,17 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                  {row.getVisibleCells().map((cell, index) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        (index >= 0 && index <= 1) ||
+                          cell.id === `${cell.id.slice(0, 2)}createdAt` ||
+                          cell.id === `${cell.id.slice(0, 2)}actions`
+                          ? ''
+                          : 'hidden md:table-cell'
+                      )}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -112,20 +130,22 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
-          Previous
+          <ChevronLeft className="w-4 h-4 mr-4" />
+          Prev
         </Button>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
           Next
+          <ChevronRight className="w-4 h-4 ml-4" />
         </Button>
       </div>
     </div>

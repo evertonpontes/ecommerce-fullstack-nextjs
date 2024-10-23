@@ -12,27 +12,27 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import React from 'react';
-import { CategoryColumn } from '../../components/columns';
+import { ProductColumn } from '../../components/columns';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
 interface CellActionProps {
-  data: CategoryColumn;
+  data: ProductColumn;
 }
 
 const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const route = useRouter();
 
   const onUpdate = (id: string) => {
-    route.push(`/categories/${id}`);
+    route.push(`/products/edit?productId=${id}`);
   };
 
   const onDelete = async (id: string) => {
     try {
-      await axios.delete(`/api/categories/${id}`);
+      await axios.delete(`/api/products/${id}`);
       route.refresh();
-      toast.success('Category Deleted Successfully');
+      toast.success('Product Deleted Successfully');
     } catch (error) {
       console.log(error);
       toast.error('Something went wrong :(');

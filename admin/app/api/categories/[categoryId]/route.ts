@@ -54,6 +54,31 @@ export async function PUT(
   }
 }
 
+export async function GET(
+  req: Request,
+  { params }: { params: { categoryId: string } }
+) {
+  try {
+    if (!params.categoryId) {
+      return new NextResponse('Category Id is required', { status: 400 });
+    }
+
+    const category = await prisma.category.findUnique({
+      where: {
+        id: params.categoryId,
+      },
+      include: {
+        attributes: {},
+      },
+    });
+
+    return NextResponse.json(category);
+  } catch (error) {
+    console.log('[CATEGORIES_DELETE]', error);
+    return new NextResponse('Internal error', { status: 500 });
+  }
+}
+
 export async function DELETE(
   req: Request,
   { params }: { params: { categoryId: string } }

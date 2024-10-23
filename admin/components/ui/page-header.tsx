@@ -12,9 +12,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   return (
     <div className="max-w-screen-xl px-8 py-4">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">{title}</h1>
-        <p className="text-lg text-muted-foreground">{description}</p>
+      <div className="space-y-1.5">
+        <h1 className="text-2xl font-semibold leading-none tracking-tight">
+          {title}
+        </h1>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
     </div>
   );

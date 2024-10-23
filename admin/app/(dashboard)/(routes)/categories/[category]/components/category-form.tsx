@@ -36,6 +36,7 @@ import toast from 'react-hot-toast';
 interface CategoryFormProps {
   categories: Category[];
   data:
+    | void
     | ({
         attributes: Attributes[];
       } & Category)
@@ -135,6 +136,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                   onChangeImages={(imageUrls) =>
                     field.onChange(imageUrls[imageUrls.length - 1])
                   }
+                  folder="categories"
                   disabled={isPending}
                 />
               </FormControl>

@@ -1,10 +1,9 @@
 'use client';
 
-import { Category } from '@prisma/client';
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
-import CellAction from '../[categoryId]/components/cell-action';
+import CellAction from '../[category]/components/cell-action';
 
 dayjs.extend(advancedFormat);
 

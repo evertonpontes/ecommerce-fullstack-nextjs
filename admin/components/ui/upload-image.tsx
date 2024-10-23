@@ -7,26 +7,30 @@ import React, {
   useState,
 } from 'react';
 import { Input } from './input';
-import { File, Loader2, Trash2, Upload, X } from 'lucide-react';
+import { File, Loader2, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from './button';
-import { cn, convertBlobUrlToFile, fileSizeToString } from '@/lib/utils';
+import { cn, convertBlobUrlToFile } from '@/lib/utils';
 import { deleteImage, uploadImage } from '@/supabase/storage/client';
 
 interface UploadImageProps extends InputHTMLAttributes<HTMLInputElement> {
   value: string[];
   onTransition: TransitionStartFunction;
   onChangeImages: (imageUrls: string[]) => void;
+  bucket?: string;
+  folder?: string;
 }
 
 export const UploadImage: React.FC<UploadImageProps> = ({
   value,
   onChangeImages,
   onTransition,
+  bucket,
+  folder,
   ...props
 }) => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([...value]);
+  const [uploadedImages, setUploadedImages] = useState<string[]>(value);
 
   const onInputFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -58,9 +62,9 @@ export const UploadImage: React.FC<UploadImageProps> = ({
         const imageFile = await convertBlobUrlToFile(url);
 
         const { imageUrl, error } = await uploadImage({
-          bucket: 'dashboard',
+          bucket: bucket || 'dashboard',
           file: imageFile,
-          folder: 'categories',
+          folder,
         });
 
         if (error) {
