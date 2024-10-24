@@ -1,5 +1,3 @@
-'use client';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,17 +12,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, Settings, User } from 'lucide-react';
 import { User as Auth } from 'next-auth';
+import { SignOut } from './ui/signout-button';
 
 interface AvatarDropdownProps {
   user: Auth | undefined;
 }
 
 export default function AvatarDropdown({ user }: AvatarDropdownProps) {
-  const handleSignOut = () => {
-    // Implement your sign-out logic here
-    console.log('User signed out');
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -58,9 +52,11 @@ export default function AvatarDropdown({ user }: AvatarDropdownProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Sign out</span>
+          <SignOut variant={'ghost'} className="p-0 pr-4">
+            Sign out
+          </SignOut>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
