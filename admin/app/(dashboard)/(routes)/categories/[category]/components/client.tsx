@@ -1,6 +1,6 @@
 'use client';
 import { PageHeader } from '@/components/ui/page-header';
-import { Attributes, Category } from '@prisma/client';
+import { Attribute, Category } from '@prisma/client';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,9 +14,15 @@ interface CategoryClientProps {
 type DataType =
   | void
   | ({
-      attributes: Attributes[];
+      attributes: Attribute[];
     } & Category)
   | null;
+
+type CategoriesType = {
+  attributes: Attribute[];
+  childrens: Category[];
+  parent: Category;
+} & Category;
 
 export const CategoryClient: React.FC<CategoryClientProps> = ({
   categoryId,
@@ -26,7 +32,7 @@ export const CategoryClient: React.FC<CategoryClientProps> = ({
 
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<DataType>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoriesType[]>([]);
 
   const fetchDataById = useCallback(async () => {
     try {
@@ -45,7 +51,7 @@ export const CategoryClient: React.FC<CategoryClientProps> = ({
 
   const fetchAllCategories = async () => {
     try {
-      const response = await axios.get<Category[]>('/api/categories');
+      const response = await axios.get<CategoriesType[]>('/api/categories');
       setCategories(response.data);
     } catch (error) {
       console.log(error);

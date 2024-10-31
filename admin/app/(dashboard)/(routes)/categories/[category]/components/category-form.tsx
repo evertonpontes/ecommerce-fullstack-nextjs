@@ -25,28 +25,28 @@ import {
 } from '@/components/ui/select';
 
 import React, { useState, useTransition } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Attributes, Category } from '@prisma/client';
+import { Attribute, Category } from '@prisma/client';
 import { Plus, Trash } from 'lucide-react';
-import { UploadImage } from '@/components/ui/upload-image';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 interface CategoryFormProps {
-  categories: Category[];
+  categories: ({
+    attributes: Attribute[];
+    childrens: Category[];
+    parent: Category;
+  } & Category)[];
   data:
     | void
     | ({
-        attributes: Attributes[];
+        attributes: Attribute[];
       } & Category)
     | null;
 }
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
-  description: z.string().min(2).max(500),
-  imageUrl: z.string(),
   parentId: z.string().nullable(),
   attributes: z
     .object({
@@ -63,10 +63,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: data ? data.name : '',
-      description: data ? data.description : '',
-      imageUrl: data ? data.imageUrl : '',
       parentId: data ? data.parentId : '',
-      attributes: data ? data.attributes : [{ name: '' }],
+      attributes: data ? data.attributes : [],
     },
   });
 
@@ -117,6 +115,18 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     setAttributes(updatedAttributes);
   };
 
+  const onParentChange = (parentId: string) => {
+    form.setValue('parentId', parentId);
+
+    const parent = categories.filter((cat) => cat.id === parentId)[0];
+    const parentAttributes = parent.attributes.map((atr) => ({
+      name: atr.name,
+    }));
+
+    form.setValue('attributes', parentAttributes);
+    setAttributes(parentAttributes);
+  };
+
   return (
     <Form {...form}>
       <form
@@ -125,49 +135,18 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       >
         <FormField
           control={form.control}
-          name="imageUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Image</FormLabel>
-              <FormControl>
-                <UploadImage
-                  value={field.value ? [field.value] : []}
-                  onTransition={startTransition}
-                  onChangeImages={(imageUrls) =>
-                    field.onChange(imageUrls[imageUrls.length - 1])
-                  }
-                  folder="categories"
-                  disabled={isPending}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>
+                Name <span className="text-destructive">*</span>
+              </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="type a name."
+                  placeholder="type a name"
                   {...field}
                   disabled={isPending}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} disabled={isPending} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -180,25 +159,31 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             <FormItem>
               <FormLabel>Parent Category</FormLabel>
               <Select
-                onValueChange={field.onChange}
+                onValueChange={onParentChange}
                 defaultValue={field.value || ''}
                 disabled={isPending}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category." />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem
-                      disabled={category.id === data?.id}
-                      key={category.id}
-                      value={category.id}
-                    >
-                      {category.name}
+                  {categories.length ? (
+                    categories.map((category) => (
+                      <SelectItem
+                        disabled={category.id === data?.id}
+                        key={category.id}
+                        value={category.id}
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem disabled={true} value={'default'}>
+                      No categories found.
                     </SelectItem>
-                  ))}
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -224,7 +209,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                         />
                         <Button
                           type="button"
-                          variant="outline"
+                          variant="destructive"
                           size="icon"
                           onClick={() => onRemoveAttribute(index)}
                           disabled={isPending}

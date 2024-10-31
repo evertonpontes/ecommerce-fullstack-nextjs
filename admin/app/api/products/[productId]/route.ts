@@ -74,6 +74,7 @@ export async function GET(
       include: {
         images: {},
         productAttributes: {},
+        variesBy: {},
       },
     });
 
@@ -98,6 +99,18 @@ export async function DELETE(
     if (!session || !session.user) {
       return new NextResponse('Unauthenticated', { status: 401 });
     }
+
+    await prisma.productAttribute.deleteMany({
+      where: {
+        productId: params.productId,
+      },
+    });
+
+    await prisma.productImage.deleteMany({
+      where: {
+        productId: params.productId,
+      },
+    });
 
     const product = await prisma.product.delete({
       where: {

@@ -9,139 +9,86 @@ generator client {
   previewFeatures = ["driverAdapters"]
 }
 
-model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String          @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  // Optional for WebAuthn support
-  Authenticator Authenticator[]
+model Attribute {
+  id   String @id @default(cuid())
+  name String
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  categoryId String?
 }
 
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([provider, providerAccountId])
-}
-
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-}
-
-// Optional for WebAuthn support
-model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, credentialID])
-}
-
-model Attributes {
+model Category {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
+  parent Category? @relation("ParentToChildren", fields: [parentId], references: [id])
 
-model Category {
-  id          String @id @default(cuid())
-  name        String
-  description String
-  imageUrl    String
+  parentId String?
 
-  parentId  String?
-  parent    Category?  @relation("ParentToChildren", fields: [parentId], references: [id])
   childrens Category[] @relation("ParentToChildren")
 
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  attributes Attributes[]
-  product    Product[]    @relation("CategoryToProduct")
+  attributes Attribute[]
+
+  products Product[] @relation("CategoryToProduct")
 }
 
 model Product {
-  id          String  @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
-  title       String
-  brand       String
   description String
   price       Decimal
+  brand       String
+  discount    Decimal //0 to 100
   amount      Int
-  discount    Decimal // 0 to 1
+  sku         String
   keywords    String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  images      ProductImage[]
 
-  images            ProductImage[]
+  category Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+
+  categoryId String
+
   productAttributes ProductAttribute[]
-  categoryId        String
-  category          Category           @relation("CategoryToProduct", fields: [categoryId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  productGroup Product? @relation("ProductToVariant", fields: [productGroupId], references: [id])
+
+  productGroupId String?
+
+  hasVariant Product[] @relation("ProductToVariant")
+
+  variesBy Variant[]
 }
 
 model ProductImage {
-  id        String   @id @default(cuid())
-  url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id  String @id @default(cuid())
+  url String
 
-  product   Product? @relation(fields: [productId], references: [id])
-  productId String?
+  Product Product @relation(fields: [productId], references: [id])
+
+  productId String
 }
 
 model ProductAttribute {
-  id             String   @id @default(cuid())
+  id             String @id @default(cuid())
   attributeName  String
   attributeValue String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Variant {
+  id             String  @id @default(cuid())
+  attributeName  String
+  attributeValue String?
+
+  product Product @relation(fields: [productId], references: [id])
+
+  productId String
 }

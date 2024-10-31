@@ -16,10 +16,8 @@ import {
   Package,
   ShoppingCart,
   Users,
-  Menu,
   SidebarIcon,
-  Coffee,
-  Cookie,
+  Table,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,7 +30,7 @@ export function Aside() {
 
   const navItems = [
     {
-      name: 'Dashboard',
+      name: 'Home',
       icon: Home,
       href: '/',
       isActive: pathname === '/',
@@ -66,7 +64,7 @@ export function Aside() {
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-        <Cookie className="fill-orange-100 stroke-orange-400 h-9 w-9 md:h-8 md:w-8" />
+        <Table className="fill-primary/40 stroke-primary h-9 w-9 md:h-8 md:w-8" />
         {navItems.map((item, index) => (
           <TooltipItem key={index} content={item.name}>
             <Link
@@ -92,7 +90,7 @@ export function Sidebar() {
 
   const navItems = [
     {
-      name: 'Dashboard',
+      name: 'Home',
       icon: Home,
       href: '/',
       isActive: pathname === '/',
@@ -143,7 +141,7 @@ export function Sidebar() {
       <div className="flex h-full w-full flex-col bg-background">
         <div className="p-6">
           <SheetTitle className="flex items-center gap-4">
-            <Cookie className="fill-orange-100 stroke-orange-400 h-10 w-10" />
+            <Table className="fill-primary/40 stroke-primary h-10 w-10" />
             Dashboard
           </SheetTitle>
           <SheetDescription className="ml-12">
