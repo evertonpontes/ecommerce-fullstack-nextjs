@@ -5,9 +5,6 @@ const nextConfig = {
       {
         hostname: 'fdrrundudwlfxcxezebu.supabase.co',
       },
-      {
-        hostname: 'placehold.co',
-      },
     ],
   },
 };

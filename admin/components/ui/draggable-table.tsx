@@ -32,7 +32,9 @@ import {
   flexRender,
 } from '@tanstack/react-table';
 
-type DataType = { id: string; image: string; [key: string]: string };
+type GenericData = { [key: string]: string };
+
+type DataType = { id: string } & (GenericData | any);
 
 interface DraggableTableProps<TValue> {
   columns: ColumnDef<DataType, TValue>[];
