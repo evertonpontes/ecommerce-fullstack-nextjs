@@ -103,7 +103,7 @@ export const UploadImage: React.FC<UploadImageProps> = ({
               />
             </div>
           ) : (
-            <div className="text-sm flex items-center gap-4">
+            <div className="text-sm flex flex-col md:flex-row items-center gap-4">
               <File className="w-4 h-4" />
               <span>({uploadedImages.length}) Image(s) uploaded.</span>
             </div>

@@ -1,7 +1,7 @@
 'use client';
 import { PageHeader } from '@/components/ui/page-header';
 import {
-  Attributes,
+  Attribute,
   Category,
   Product,
   ProductAttribute,
@@ -46,7 +46,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<DataType>(null);
   const [categories, setCategories] = useState<
-    ({ attributes: Attributes[] } & Category)[]
+    ({ attributes: Attribute[] } & Category)[]
   >([]);
 
   const fetchDataById = useCallback(async () => {
@@ -70,7 +70,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   const fetchAllCategories = async () => {
     try {
       const response = await axios.get<
-        ({ attributes: Attributes[] } & Category)[]
+        ({ attributes: Attribute[] } & Category)[]
       >('/api/categories');
       setCategories(response.data);
     } catch (error) {

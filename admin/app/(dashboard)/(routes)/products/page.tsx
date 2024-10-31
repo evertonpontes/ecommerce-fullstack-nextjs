@@ -14,19 +14,24 @@ const ProductsPage = async () => {
     include: {
       category: {},
       images: {},
+      hasVariant: {},
+      productAttributes: {},
+      productGroup: {},
+      _count: true,
     },
   });
 
   const data = products.map((product) => ({
     id: product.id,
-    title: product.title,
+    name: product.name,
+    description: product.description,
     brand: product.brand,
     price: Number(product.price),
     discount: Number(product.discount),
     category: product.category.name,
     createdAt: product.createdAt,
     images: product.images.map((image) => image.url),
-    status: product.amount <= 0 ? 'Out of Stock' : 'In Stock',
+    availability: product.amount <= 0 ? 'Out of Stock' : 'In Stock',
   }));
 
   return (
@@ -48,7 +53,7 @@ const ProductsPage = async () => {
       <div className="max-w-screen-xl mx-auto px-8">
         <Card>
           <CardContent className="p-6">
-            <DataTable columns={Columns} data={data} filter="title" />
+            <DataTable columns={Columns} data={data} filter="name" />
           </CardContent>
         </Card>
       </div>

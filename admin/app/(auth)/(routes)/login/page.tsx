@@ -10,7 +10,7 @@ export default async function LoginPage() {
         <FcGoogle className="w-6 h-6" />
         SignIn With Google
       </SignIn>
-      <SignIn provider="github" className="gap-4">
+      <SignIn provider="github" className="gap-4 !bg-black">
         <FaGithub className="w-6 h-6" />
         SignIn With GitHub
       </SignIn>

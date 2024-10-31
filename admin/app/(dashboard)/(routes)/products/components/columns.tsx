@@ -12,65 +12,51 @@ dayjs.extend(advancedFormat);
 
 export type ProductColumn = {
   id: string;
-  title: string;
-  brand: string;
+  name: string;
+  description: string;
   price: number;
+  brand: string;
   discount: number;
-  category: string;
-  createdAt: Date;
+  availability: string;
   images: string[];
-  status: string;
+  createdAt: Date;
+  category: string;
 };
 
 export const Columns: ColumnDef<ProductColumn>[] = [
   {
-    id: 'image',
-    cell: ({ row }) => {
-      return (
-        <div className="relative w-10 h-10 rounded-md items-center justify-center">
-          <Image
-            alt="product"
-            src={
-              row.original.images[0] ||
-              'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
-            }
-            fill
-            sizes="(max-width: 40px) 100vw, (max-width: 80px) 50vw, 33vw"
-            className="object-cover absolute"
-          />
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: 'title',
+    accessorKey: 'name',
     header: 'Name',
   },
   {
-    accessorKey: 'status',
+    accessorKey: 'availability',
     header: 'Status',
-    cell: ({ row }) => (
-      <Badge
-        variant={row.original.status === 'In Stock' ? 'outline' : 'destructive'}
-      >
-        {row.original.status}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      return (
+        <Badge
+          variant={
+            row.original.availability === 'In Stock' ? 'outline' : 'destructive'
+          }
+        >
+          {row.original.availability}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: 'price',
     header: 'Price',
     cell: ({ row }) => {
-      const priceFormatted = formatter.format(row.original.price);
-
-      return <span>{priceFormatted}</span>;
+      return <span>{row.original.price}</span>;
     },
   },
   {
     accessorKey: 'createdAt',
     header: 'Date',
     cell: ({ row }) => {
-      const formatedDate = dayjs(row.original.createdAt).format('M/D/YYYY');
+      const formatedDate = dayjs(row.original.createdAt).format(
+        'MMMM Do, YYYY'
+      );
 
       return <div>{formatedDate}</div>;
     },

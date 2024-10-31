@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 export const productSchema = z.object({
   name: z.string().min(2).max(50),
-  title: z.string().min(2).max(50),
+  sku: z.string().min(2).max(50),
   brand: z.string().min(2).max(50),
   price: z.number().positive(),
   discount: z.number().min(0).max(100),
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const product = await prisma.product.create({
       data: {
         ...data,
-        keywords: data.keywords.join(' '),
+        keywords: data.keywords.join(', '),
         images: {
           createMany: {
             data: data.images.map((image: string) => ({ url: image })),
@@ -68,6 +68,10 @@ export async function GET(req: Request) {
         category: true,
         images: true,
         productAttributes: true,
+        hasVariant: true,
+        productGroup: true,
+        variesBy: true,
+        _count: true,
       },
     });
 

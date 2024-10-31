@@ -128,25 +128,51 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          <ChevronLeft className="w-4 h-4 mr-4" />
-          Prev
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-          <ChevronRight className="w-4 h-4 ml-4" />
-        </Button>
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="text-xs text-muted-foreground">
+          {table.getExpandedRowModel().rows.length >= 1 ? (
+            <>
+              Showing{' '}
+              <strong>
+                {table.getPaginationRowModel().rows[0].index +
+                  1 +
+                  '-' +
+                  (table.getPaginationRowModel().rows[
+                    table.getPaginationRowModel().rows.length - 1
+                  ].index +
+                    1) +
+                  ' '}
+              </strong>
+              of
+              <strong>{' ' + table.getExpandedRowModel().rows.length}</strong>
+            </>
+          ) : (
+            <>
+              Showing <strong>0</strong> of
+              <strong>{' ' + table.getExpandedRowModel().rows.length}</strong>
+            </>
+          )}
+        </div>
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeft className="w-4 h-4 mr-4" />
+            Prev
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+            <ChevronRight className="w-4 h-4 ml-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
