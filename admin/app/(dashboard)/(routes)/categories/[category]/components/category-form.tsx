@@ -26,7 +26,7 @@ import {
 
 import React, { useState, useTransition } from 'react';
 import { Attribute, Category } from '@prisma/client';
-import { Plus, Trash } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -34,7 +34,7 @@ import toast from 'react-hot-toast';
 interface CategoryFormProps {
   categories: ({
     attributes: Attribute[];
-    childrens: Category[];
+    subCategories: Category[];
     parent: Category;
   } & Category)[];
   data:
@@ -47,6 +47,13 @@ interface CategoryFormProps {
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
+  slug: z
+    .string()
+    .min(2)
+    .max(50)
+    .regex(/^[a-z0-9-]+$/, {
+      message: 'Slug can only contain lowercase letters, numbers, and hyphens.',
+    }),
   parentId: z.string().nullable(),
   attributes: z
     .object({
@@ -63,6 +70,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: data ? data.name : '',
+      slug: data ? data.slug : '',
       parentId: data ? data.parentId : '',
       attributes: data ? data.attributes : [],
     },
@@ -131,7 +139,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 max-w-3xl mx-auto mb-8"
+        className="grid md:grid-cols-2 lg:grid-cols-3 items-end gap-8 max-w-3xl m-8"
       >
         <FormField
           control={form.control}
@@ -140,6 +148,25 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             <FormItem>
               <FormLabel>
                 Name <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="type a name"
+                  {...field}
+                  disabled={isPending}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Slug <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
                 <Input
@@ -190,9 +217,9 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
             </FormItem>
           )}
         />
-        <div>
-          <Label>Attributes</Label>
-          <div className="space-y-2 mt-2 max-w-lg">
+        <div className="grid grid-cols-subgrid gap-8 md:col-span-2 lg:col-span-3">
+          <div className="space-y-2 max-w-lg flex flex-col">
+            <Label>Attributes</Label>
             {attributes.map((_attr, index) => (
               <FormField
                 key={index}
@@ -211,10 +238,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                           type="button"
                           variant="destructive"
                           size="icon"
+                          className="flex-shrink-0"
                           onClick={() => onRemoveAttribute(index)}
                           disabled={isPending}
                         >
-                          <Trash className="h-4 w-4" />
+                          <X className="h-4 w-4" />
                           <span className="sr-only">Remove attribute</span>
                         </Button>
                       </div>

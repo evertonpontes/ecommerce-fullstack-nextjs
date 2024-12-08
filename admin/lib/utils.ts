@@ -30,3 +30,13 @@ export async function fileSizeToString(file: File) {
 
   return `${(Math.round(+fileSize / 1024) / 1000).toFixed(2)}MB`;
 }
+
+export function generateNameSlug(word: string) {
+  const slug = word
+    .toLowerCase()
+    .trim()
+    .replace(/^[\W_]+|[\W_]+$/g, '')
+    .replace(/(?<=\w)[\W_]+(?=\w)/g, '-');
+
+  return slug;
+}

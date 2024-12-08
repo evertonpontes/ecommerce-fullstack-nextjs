@@ -21,6 +21,7 @@ model Attribute {
 model Category {
   id        String   @id @default(cuid())
   name      String
+  slug      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -28,32 +29,40 @@ model Category {
 
   parentId String?
 
-  childrens Category[] @relation("ParentToChildren")
+  subCategories Category[] @relation("ParentToChildren")
 
   attributes Attribute[]
 
   products Product[] @relation("CategoryToProduct")
+
+  @@index([slug])
+}
+
+enum ProductType {
+  single_product
+  product_group
+  variant_product
 }
 
 model Product {
-  id          String         @id @default(cuid())
-  name        String
-  description String
-  price       Decimal
-  brand       String
-  discount    Decimal //0 to 100
-  amount      Int
-  sku         String
-  keywords    String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  images      ProductImage[]
+  id                 String      @id @default(cuid())
+  name               String
+  sku                String      @unique
+  description        String
+  price              Decimal     @db.Money
+  discount           Decimal     @db.Decimal(5, 2) //0 to 100
+  stock              Int         @default(0)
+  productType        ProductType @default(single_product)
+  productAttributes  Json?       @db.Json
+  variantCombination Json?       @db.Json
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  images ProductImage[]
 
   category Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
 
   categoryId String
-
-  productAttributes ProductAttribute[]
 
   productGroup Product? @relation("ProductToVariant", fields: [productGroupId], references: [id])
 
@@ -61,7 +70,9 @@ model Product {
 
   hasVariant Product[] @relation("ProductToVariant")
 
-  variesBy Variant[]
+  variesBy Variation[]
+
+  @@index([categoryId], name: "product_category_idx")
 }
 
 model ProductImage {
@@ -71,24 +82,56 @@ model ProductImage {
   Product Product @relation(fields: [productId], references: [id])
 
   productId String
+
+  @@index([productId], name: "image_product_idx")
 }
 
-model ProductAttribute {
-  id             String @id @default(cuid())
-  attributeName  String
-  attributeValue String
+model Variation {
+  id   String @id @default(cuid())
+  name String
+  slug String
+
+  options VariationOption[]
 
   product Product @relation(fields: [productId], references: [id])
 
   productId String
+
+  @@index([productId], name: "variation_product_idx")
 }
 
-model Variant {
-  id             String  @id @default(cuid())
-  attributeName  String
-  attributeValue String?
+model VariationOption {
+  id         String    @id @default(cuid())
+  value      String
+  optionSlug String
+  swatch     Swatch    @relation(fields: [swatchId], references: [id])
+  variation  Variation @relation(fields: [variationId], references: [id])
 
-  product Product @relation(fields: [productId], references: [id])
+  variationId String
+  swatchId    String @unique
 
-  productId String
+  @@index([variationId], name: "option_variantion_idx")
+}
+
+model Swatch {
+  id                 String      @id @default(cuid())
+  swatchType         SwatchType  @default(TEXT) // COLOR | IMAGE | TEXT
+  swatchShape        SwatchShape @default(SQUARE) // CIRCLE | SQUARE
+  swatchColor        String?
+  swatchThumbnailUrl String?
+  swatchText         String?
+
+  variationOption VariationOption?
+}
+
+// Enum to define display types of swatch
+enum SwatchType {
+  COLOR
+  IMAGE
+  TEXT
+}
+
+enum SwatchShape {
+  CIRCLE
+  SQUARE
 }

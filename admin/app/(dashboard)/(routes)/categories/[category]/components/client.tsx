@@ -20,7 +20,7 @@ type DataType =
 
 type CategoriesType = {
   attributes: Attribute[];
-  childrens: Category[];
+  subCategories: Category[];
   parent: Category;
 } & Category;
 
