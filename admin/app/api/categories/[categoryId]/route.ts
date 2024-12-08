@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { prisma } from '@/prisma';
 import { NextResponse } from 'next/server';
+import { categoryBase } from '../route';
 
 export async function PUT(
   req: Request,
@@ -13,14 +14,10 @@ export async function PUT(
 
     const session = await auth();
     const body = await req.json();
-    const { name, parentId, attributes, variants } = body;
+    const { name, parentId, attributes, slug } = categoryBase.parse(body);
 
     if (!session || !session.user) {
       return new NextResponse('Unauthenticated', { status: 401 });
-    }
-
-    if (!name) {
-      return new NextResponse('Name is required', { status: 400 });
     }
 
     const category = await prisma.category.update({
@@ -29,6 +26,7 @@ export async function PUT(
       },
       data: {
         name,
+        slug,
         parentId: parentId || undefined,
         attributes: {
           deleteMany: {
@@ -63,6 +61,9 @@ export async function GET(
       },
       include: {
         attributes: {},
+        parent: {},
+        products: {},
+        subCategories: {},
       },
     });
 

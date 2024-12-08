@@ -1,16 +1,10 @@
 'use client';
 import { PageHeader } from '@/components/ui/page-header';
-import {
-  Attribute,
-  Category,
-  Product,
-  ProductAttribute,
-  ProductImage,
-} from '@prisma/client';
+import { Attribute, Category, Product, ProductImage } from '@prisma/client';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { ProductForm } from './product-form';
+import { ProductForm } from './form-components/product-form';
 
 interface ProductClientProps {
   params: string;
@@ -115,7 +109,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
       {!isLoading ? (
         <>
           <PageHeader title={header.title} description={header.description} />
-          <ProductForm categories={categories} data={data} />
+          <ProductForm categories={categories} />
         </>
       ) : (
         ''

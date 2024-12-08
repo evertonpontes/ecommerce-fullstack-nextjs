@@ -142,7 +142,7 @@ export function Sidebar() {
         <div className="p-6">
           <SheetTitle className="flex items-center gap-4">
             <Table className="fill-primary/40 stroke-primary h-10 w-10" />
-            Dashboard
+            ShopDash
           </SheetTitle>
           <SheetDescription className="ml-12">
             E-commerce Admin

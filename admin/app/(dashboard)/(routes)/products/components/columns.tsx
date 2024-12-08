@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
-import CellAction from '../[product]/components/cell-action';
+import CellAction from './cell-action';
 import Image from 'next/image';
 import { formatter } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
