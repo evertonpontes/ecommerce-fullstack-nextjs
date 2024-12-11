@@ -1,9 +1,7 @@
 'use client';
 
-import { z } from 'zod';
-
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { ProductFormContext, variationSchema } from './product-form';
+import { ProductFormContext } from './product-form';
 import {
   Table,
   TableBody,
@@ -20,11 +18,9 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Edit,
-  MoreHorizontal,
 } from 'lucide-react';
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -41,7 +37,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Images } from './images';
-import { stat } from 'fs';
+import { TextEditor } from '@/components/ui/text-editor';
 
 export const ProductVariants = () => {
   const { form, states } = useContext(ProductFormContext);
@@ -142,7 +138,7 @@ export const ProductVariants = () => {
                     : ''
                 }
               >
-                {Object.values(variant.combination).join(' / ')}
+                {Object.values(variant.combination).join(' / ').toUpperCase()}
               </TableCell>
               <TableCell>{formatter.format(variant.price)}</TableCell>
               <TableCell className="hidden sm:table-cell">
@@ -262,6 +258,10 @@ const EditProductVariantSidebar = ({
     onClose();
   };
 
+  useEffect(() => {
+    onVariantsChange(form.watch('hasVariant'));
+  }, [form, onVariantsChange]);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
@@ -365,6 +365,22 @@ const EditProductVariantSidebar = ({
                 <FormLabel>SKU</FormLabel>
                 <FormControl>
                   <Input placeholder="Type a sku" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="sm:col-span-2">
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <TextEditor
+                    description={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

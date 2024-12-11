@@ -18,7 +18,9 @@ type ImagesProps<
 
 export const Images = ({ name }: ImagesProps<z.infer<typeof formSchema>>) => {
   const { form, startTransition, isPending } = useContext(ProductFormContext);
-  const formattedImages = form.getValues().images.map(({ url }) => url);
+  const formattedImages = form
+    .watch(name)
+    .map(({ url }: { url: string }) => url);
 
   function handleFilesChange(values: string[]) {
     const formattedImages = values.map((value) => ({ url: value }));
