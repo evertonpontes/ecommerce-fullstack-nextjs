@@ -29,8 +29,8 @@ import { TextEditor } from '@/components/ui/text-editor';
 import { ProductSwatches } from './product-swatches';
 
 export const optionSwatchSchema = z.object({
-  swatchType: z.enum(['COLOR', 'IMAGE', 'TEXT']),
-  swatchShape: z.enum(['SQUARE', 'CIRCLE']),
+  swatchType: z.enum(['COLOR', 'IMAGE', 'TEXT']).optional(),
+  swatchShape: z.enum(['SQUARE', 'CIRCLE']).optional(),
   swatchColor: z.string().optional(),
   swatchThumbnailUrl: z.string().optional(),
   swatchText: z.string().optional(),
@@ -161,7 +161,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
     setHasVariations(value);
     if (!value) {
       form.setValue('variesBy', []);
+      form.setValue('hasVariant', []);
       setVariations([]);
+      setVariants([]);
     }
   }
 
@@ -187,6 +189,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
             <div className="space-y-8">
               <BasicInfo />
               {attributes.length ? <ProductAttributes /> : ''}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <TextEditor
+                        description={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="has-variations"
@@ -210,23 +228,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
               ) : (
                 ''
               )}
-              <Separator />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <TextEditor
-                        description={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             <div className="space-y-8">
               <Images name="images" />

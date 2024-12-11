@@ -24,7 +24,8 @@ type VariationValues = z.infer<typeof variationSchema>;
 
 function generateVariants(
   variations: VariationValues[],
-  form: UseFormReturn<z.infer<typeof formSchema>>
+  form: UseFormReturn<z.infer<typeof formSchema>>,
+  existingVariants: z.infer<typeof productBase>[]
 ): z.infer<typeof productBase>[] {
   function generateCombinations(
     variations: VariationValues[],
@@ -43,7 +44,7 @@ function generateVariants(
     for (const option of variationOptions) {
       generateCombinations(
         remainingVariations,
-        { ...combination, [currentVariation]: option.value },
+        { ...combination, [currentVariation]: option.optionSlug },
         result
       );
     }
@@ -53,11 +54,28 @@ function generateVariants(
 
   const combinations = generateCombinations(variations);
 
-  const newVariants = combinations.map((combination, index) => ({
-    ...(form.getValues().hasVariant[index] || form.getValues()),
-    combination,
-    hasVariant: [],
-  }));
+  const newVariants = combinations.map((combination) => {
+    // Attempt to find an existing variant that matches on shared properties
+    const matchedVariant = form.watch('hasVariant').find((variant) => {
+      return Object.entries(combination).some(
+        ([key, value]) => variant.combination[key] === value
+      );
+    });
+
+    return {
+      ...(matchedVariant || form.getValues()),
+      combination,
+      hasVariant: [],
+      name:
+        form.getValues().name +
+        ' ' +
+        Object.values(combination)
+          .map((x) => x.toUpperCase())
+          .join(' - '),
+      variesBy: form.getValues().variesBy,
+      images: matchedVariant?.images || [],
+    };
+  });
 
   return newVariants;
 }
@@ -145,8 +163,13 @@ export const ProductVariations = ({
       } else {
         onVariationsChange([...newVariations]);
         form.setValue('variesBy', [...newVariations]);
-        onVariantsChange(generateVariants([...newVariations], form));
-        form.setValue('hasVariant', generateVariants([...newVariations], form));
+        onVariantsChange(
+          generateVariants([...newVariations], form, states.variants)
+        );
+        form.setValue(
+          'hasVariant',
+          generateVariants([...newVariations], form, states.variants)
+        );
       }
     }
     setVariation({
@@ -360,8 +383,13 @@ export const ShowVariations = () => {
       onVariantsChange([]);
       form.setValue('hasVariant', []);
     } else {
-      onVariantsChange(generateVariants(filteredVariations, form));
-      form.setValue('hasVariant', generateVariants(filteredVariations, form));
+      onVariantsChange(
+        generateVariants(filteredVariations, form, states.variants)
+      );
+      form.setValue(
+        'hasVariant',
+        generateVariants(filteredVariations, form, states.variants)
+      );
     }
   }
 
