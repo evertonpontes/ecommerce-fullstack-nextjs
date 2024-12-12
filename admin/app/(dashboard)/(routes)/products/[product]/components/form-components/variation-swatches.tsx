@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { ProductFormContext, variationOptionSchema } from './product-form';
 
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -28,7 +28,7 @@ type SwatchShape = 'CIRCLE' | 'SQUARE';
 type SwatchOption = z.infer<typeof variationOptionSchema>;
 
 export default function VariationSwatchForm() {
-  const { form, states, onVariationsChange } = useContext(ProductFormContext);
+  const { states } = useContext(ProductFormContext);
   const { variations } = states;
   const [selectedVariation, setSelectedVariation] = useState<string>(
     variations[0].name

@@ -26,26 +26,28 @@ export async function PUT(
       },
       data: {
         ...data,
-        keywords: data.keywords.join(' '),
         images: {
           deleteMany: {
             productId: params.productId,
           },
           createMany: {
-            data: data.images.map((image: string) => ({ url: image })),
+            data: data.images,
           },
         },
-        productAttributes: {
+        variesBy: {
           deleteMany: {
             productId: params.productId,
           },
           createMany: {
-            data: data.productAttributes.map(
-              (attr: { name: string; value: string }) => ({
-                attributeName: attr.name,
-                attributeValue: attr.value,
-              })
-            ),
+            data: data.variesBy,
+          },
+        },
+        hasVariant: {
+          deleteMany: {
+            productGroupId: params.productId,
+          },
+          createMany: {
+            data: data.hasVariant,
           },
         },
       },
@@ -72,9 +74,12 @@ export async function GET(
         id: params.productId,
       },
       include: {
-        images: {},
-        productAttributes: {},
-        variesBy: {},
+        category: true,
+        images: true,
+        hasVariant: true,
+        productGroup: true,
+        variesBy: true,
+        _count: true,
       },
     });
 
@@ -100,19 +105,30 @@ export async function DELETE(
       return new NextResponse('Unauthenticated', { status: 401 });
     }
 
-    await prisma.productAttribute.deleteMany({
+    const product = await prisma.product.update({
       where: {
-        productId: params.productId,
+        id: params.productId,
+      },
+      data: {
+        images: {
+          deleteMany: {
+            productId: params.productId,
+          },
+        },
+        variesBy: {
+          deleteMany: {
+            productId: params.productId,
+          },
+        },
+        hasVariant: {
+          deleteMany: {
+            productGroupId: params.productId,
+          },
+        },
       },
     });
 
-    await prisma.productImage.deleteMany({
-      where: {
-        productId: params.productId,
-      },
-    });
-
-    const product = await prisma.product.delete({
+    await prisma.product.delete({
       where: {
         id: params.productId,
       },

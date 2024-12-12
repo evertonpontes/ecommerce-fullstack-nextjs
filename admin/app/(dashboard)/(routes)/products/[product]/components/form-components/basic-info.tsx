@@ -22,7 +22,7 @@ import {
 import { Asterisk, Percent } from 'lucide-react';
 
 export const BasicInfo = () => {
-  const { form, categories, onAttributesChange } =
+  const { form, categories, onAttributesChange, onProductBaseChange } =
     useContext(ProductFormContext);
 
   // return attributes of category
@@ -59,7 +59,14 @@ export const BasicInfo = () => {
               <Asterisk className="flex-shrink-0 h-4 w-4 text-destructive" />
             </FormLabel>
             <FormControl>
-              <Input placeholder="Enter name" {...field} />
+              <Input
+                placeholder="Enter name"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  onProductBaseChange(field.name, e.target.value);
+                }}
+              />
             </FormControl>
             <FormDescription>
               The name of your product as it will appear in the catalog.
@@ -78,7 +85,14 @@ export const BasicInfo = () => {
               <Asterisk className="flex-shrink-0 h-4 w-4 text-destructive" />
             </FormLabel>
             <FormControl>
-              <Input placeholder="Enter SKU" {...field} />
+              <Input
+                placeholder="Enter SKU"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  onProductBaseChange(field.name, e.target.value);
+                }}
+              />
             </FormControl>
             <FormDescription>
               A unique code that tracks products inventory.
@@ -100,7 +114,10 @@ export const BasicInfo = () => {
                 min={0}
                 placeholder="Enter the stock"
                 {...field}
-                onChange={({ target }) => field.onChange(Number(target.value))}
+                onChange={({ target }) => {
+                  field.onChange(Number(target.value));
+                  onProductBaseChange(field.name, Number(target.value));
+                }}
               />
             </FormControl>
             <FormMessage />
@@ -120,7 +137,10 @@ export const BasicInfo = () => {
                 min={0}
                 placeholder="Enter the price"
                 {...field}
-                onChange={({ target }) => field.onChange(Number(target.value))}
+                onChange={({ target }) => {
+                  field.onChange(Number(target.value));
+                  onProductBaseChange(field.name, Number(target.value));
+                }}
               />
             </FormControl>
             <FormMessage />
@@ -142,7 +162,10 @@ export const BasicInfo = () => {
                 min={0}
                 placeholder="Enter the discount"
                 {...field}
-                onChange={({ target }) => field.onChange(Number(target.value))}
+                onChange={({ target }) => {
+                  field.onChange(Number(target.value));
+                  onProductBaseChange(field.name, Number(target.value));
+                }}
               />
             </FormControl>
             <FormMessage />
@@ -155,7 +178,13 @@ export const BasicInfo = () => {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Category</FormLabel>
-            <Select onValueChange={onCategorySelect} defaultValue={field.value}>
+            <Select
+              onValueChange={(value) => {
+                onCategorySelect(value);
+                onProductBaseChange(field.name, value);
+              }}
+              defaultValue={field.value}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose..." />

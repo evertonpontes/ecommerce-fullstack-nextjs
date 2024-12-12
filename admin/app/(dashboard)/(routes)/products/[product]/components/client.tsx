@@ -1,35 +1,18 @@
 'use client';
 import { PageHeader } from '@/components/ui/page-header';
-import { Attribute, Category, Product, ProductImage } from '@prisma/client';
+import { Attribute, Category } from '@prisma/client';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { ProductForm } from './form-components/product-form';
+import { useCallback, useEffect, useState, useTransition } from 'react';
+import { formSchema, ProductForm } from './form-components/product-form';
+import { z } from 'zod';
 
 interface ProductClientProps {
   params: string;
   productId: string;
 }
 
-type DataType = {
-  price: number;
-  discount: number;
-  amount: number;
-  images: string[];
-  keywords: string[];
-  productAttributes: {
-    name: string;
-    value: string;
-  }[];
-  name: string;
-  title: string;
-  brand: string;
-  description: string;
-  categoryId: string;
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-} | null;
+type DataType = { id: string } & z.infer<typeof formSchema>;
 
 export const ProductClient: React.FC<ProductClientProps> = ({
   productId,
@@ -37,20 +20,15 @@ export const ProductClient: React.FC<ProductClientProps> = ({
 }) => {
   const route = useRouter();
 
-  const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState<DataType>(null);
+  const [isPending, startTransition] = useTransition();
+  const [data, setData] = useState<DataType | undefined>(undefined);
   const [categories, setCategories] = useState<
     ({ attributes: Attribute[] } & Category)[]
   >([]);
 
   const fetchDataById = useCallback(async () => {
     try {
-      const response = await axios.get<
-        {
-          images: ProductImage[];
-          productAttributes: ProductAttribute[];
-        } & Product
-      >(`/api/products/${productId}`);
+      const response = await axios.get<DataType>(`/api/products/${productId}`);
       if (!response.data) {
         route.refresh();
         route.push('/');
@@ -73,28 +51,15 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   };
 
   useEffect(() => {
-    setTimeout(async () => {
-      if (params === 'edit') {
-        const response = await fetchDataById();
-        const formattedProduct = response
-          ? {
-              ...response,
-              price: Number(response.price),
-              discount: Number(response.discount),
-              amount: Number(response.amount),
-              images: response.images.map((image) => image.url),
-              keywords: response.keywords.split(' '),
-              productAttributes: response.productAttributes.map((attr) => ({
-                name: attr.attributeName,
-                value: attr.attributeValue,
-              })),
-            }
-          : null;
-        setData(formattedProduct || null);
-      }
-      fetchAllCategories();
-      setLoading(false);
-    }, 1000);
+    startTransition(() => {
+      setTimeout(async () => {
+        if (params === 'edit') {
+          const response = await fetchDataById();
+          setData(response);
+        }
+        fetchAllCategories();
+      }, 1000);
+    });
   }, [fetchDataById, params]);
 
   const header = {
@@ -105,11 +70,11 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   };
 
   return (
-    <div className="space-y-4 px-8 pb-4">
-      {!isLoading ? (
+    <div className="space-y-4 px-2 sm:px-8 pb-4">
+      {!isPending ? (
         <>
           <PageHeader title={header.title} description={header.description} />
-          <ProductForm categories={categories} />
+          <ProductForm categories={categories} data={data} />
         </>
       ) : (
         ''

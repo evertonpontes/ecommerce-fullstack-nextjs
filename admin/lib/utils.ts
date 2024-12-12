@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
+import { ReadonlyURLSearchParams } from 'next/navigation';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
