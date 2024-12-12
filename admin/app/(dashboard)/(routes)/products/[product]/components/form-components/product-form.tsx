@@ -27,6 +27,9 @@ import { OnChangeFn } from '@tanstack/react-table';
 import { Separator } from '@/components/ui/separator';
 import { TextEditor } from '@/components/ui/text-editor';
 import { ProductSwatches } from './product-swatches';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export const optionSwatchSchema = z.object({
   swatchType: z.enum(['COLOR', 'IMAGE', 'TEXT']).optional(),
@@ -93,6 +96,7 @@ export const formSchema = productBase.extend({
 
 interface ProductFormProps {
   categories: ({ attributes: Attribute[] } & Category)[];
+  data: ({ id: string } & z.infer<typeof formSchema>) | undefined;
 }
 
 type VariantValues = z.infer<typeof productBase>;
@@ -101,6 +105,7 @@ type ProductFormStates = {
   attributes: Attribute[];
   variations: z.infer<typeof variationSchema>[];
   variants: VariantValues[];
+  productBaseState: z.infer<typeof productBase>;
 };
 
 type ProductFormContextValue = {
@@ -111,6 +116,7 @@ type ProductFormContextValue = {
   onAttributesChange: OnChangeFn<Attribute[]>;
   onVariationsChange: OnChangeFn<z.infer<typeof variationSchema>[]>;
   onVariantsChange: OnChangeFn<VariantValues[]>;
+  onProductBaseChange: (name: string, value: any) => void;
   states: ProductFormStates;
 };
 
@@ -131,10 +137,13 @@ const defaultValues: z.infer<typeof formSchema> = {
   description: '',
 };
 
-export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
+export const ProductForm: React.FC<ProductFormProps> = ({
+  categories,
+  data,
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: data ? data : defaultValues,
   });
 
   const [isPending, startTransition] = useTransition();
@@ -144,17 +153,43 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
     z.infer<typeof variationSchema>[]
   >(form.getValues('variesBy'));
   const [variants, setVariants] = useState<VariantValues[]>([]);
+  const [productBaseState, setProductBaseState] = useState<
+    z.infer<typeof productBase>
+  >(form.getValues());
 
   const states: ProductFormStates = {
     attributes,
     variations,
     variants,
+    productBaseState,
   };
 
+  const router = useRouter();
+
+  const toastMessage = data
+    ? 'Product Updated Successfully!'
+    : 'Product Created Successfully!';
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    startTransition(async () => {
+      try {
+        if (data) {
+          await axios.put<z.infer<typeof formSchema>>(
+            `/api/products/${data.id}`,
+            values
+          );
+        } else {
+          await axios.post<z.infer<typeof formSchema>>('/api/products', values);
+        }
+
+        router.refresh();
+        router.push('/products');
+        toast.success(toastMessage);
+      } catch (error) {
+        console.log(error);
+        toast.error('Something went wrong :(');
+      }
+    });
   }
 
   function handleCheckChange(value: boolean) {
@@ -167,6 +202,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
     }
   }
 
+  const onProductBaseChange = (name: string, value: any) => {
+    setProductBaseState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
   const context: ProductFormContextValue = {
     form,
     categories,
@@ -175,6 +217,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
     onAttributesChange: setAttributes,
     onVariationsChange: setVariations,
     onVariantsChange: setVariants,
+    onProductBaseChange,
     states,
   };
 
@@ -198,7 +241,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ categories }) => {
                     <FormControl>
                       <TextEditor
                         description={field.value}
-                        onChange={field.onChange}
+                        onChange={(value) => {
+                          field.onChange(value);
+                          onProductBaseChange(field.name, value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
