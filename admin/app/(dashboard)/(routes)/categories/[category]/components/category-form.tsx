@@ -24,12 +24,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import React, { useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { Attribute, Category } from '@prisma/client';
 import { Plus, X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { generateNameSlug } from '@/lib/utils';
 
 interface CategoryFormProps {
   categories: ({
@@ -81,6 +82,8 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const [attributes, setAttributes] = useState<{ name: string }[]>(
     form.getValues('attributes')
   );
+
+  const [name, setName] = useState(data ? data.name : '');
 
   const router = useRouter();
 
@@ -135,6 +138,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     setAttributes(parentAttributes);
   };
 
+  useEffect(() => {
+    form.setValue('slug', generateNameSlug(name));
+  }, [form, name]);
+
   return (
     <Form {...form}>
       <form
@@ -153,6 +160,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                 <Input
                   placeholder="type a name"
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    setName(e.target.value);
+                  }}
                   disabled={isPending}
                 />
               </FormControl>

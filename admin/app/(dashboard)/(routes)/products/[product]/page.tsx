@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProductClient } from './components/client';
 
-const CategoryPage = async ({
+const ProductPage = async ({
   params,
   searchParams,
 }: {
@@ -13,4 +13,4 @@ const CategoryPage = async ({
   );
 };
 
-export default CategoryPage;
+export default ProductPage;

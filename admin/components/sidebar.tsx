@@ -24,6 +24,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { TooltipItem } from './tooltip-item';
+import Logo from '@/public/ecommerce-logo.svg';
 
 export function Aside() {
   const pathname = usePathname();
@@ -64,7 +65,16 @@ export function Aside() {
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-        <Table className="fill-primary/40 stroke-primary h-9 w-9 md:h-8 md:w-8" />
+        <Link href="/" className="flex items-center gap-2">
+          <div className="aspect-square size-8 relative">
+            <Image
+              src={Logo}
+              alt="logo"
+              fill
+              className="object-contain absolute"
+            />
+          </div>
+        </Link>
         {navItems.map((item, index) => (
           <TooltipItem key={index} content={item.name}>
             <Link
@@ -139,31 +149,43 @@ export function Sidebar() {
   function SidebarContent() {
     return (
       <div className="flex h-full w-full flex-col bg-background">
-        <div className="p-6">
-          <SheetTitle className="flex items-center gap-4">
-            <Table className="fill-primary/40 stroke-primary h-10 w-10" />
-            ShopDash
-          </SheetTitle>
-          <SheetDescription className="ml-12">
-            E-commerce Admin
-          </SheetDescription>
+        <div className="p-6 flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="aspect-square size-8 relative">
+              <Image
+                src={Logo}
+                alt="logo"
+                fill
+                className="object-contain absolute"
+              />
+            </div>
+            <div className="flex flex-col gap-0.5 leading-none">
+              <span className="font-semibold">E-commerce Admin</span>
+              <span className="text-xs text-muted-foreground">
+                Manage your store
+              </span>
+            </div>
+          </Link>
         </div>
         <ScrollArea className="flex-1">
-          <nav className="flex flex-col gap-2 p-4">
+          <nav className="flex flex-col pt-0 p-4">
             {navItems.map((item, index) => (
-              <Link key={index} href={item.href} passHref>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    'w-full justify-start gap-3 text-lg',
-                    item.isActive ? 'text-primary' : 'text-muted-foreground'
-                  )}
-                  onClick={() => setOpen(false)}
-                >
-                  <item.icon className="h-5 w-5" />
+              <Button
+                key={index}
+                variant="ghost"
+                size={'sm'}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  item.isActive ? 'text-primary' : 'text-muted-foreground'
+                )}
+                asChild
+                onClick={() => setOpen(false)}
+              >
+                <Link href={item.href} passHref>
+                  <item.icon className="mr-2 size-4" />
                   {item.name}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ))}
           </nav>
         </ScrollArea>

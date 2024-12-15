@@ -143,7 +143,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: data ? data : defaultValues,
+    defaultValues: data
+      ? {
+          ...data,
+          price: Number(data.price),
+          discount: Number(data.discount),
+          stock: Number(data.stock),
+        }
+      : defaultValues,
   });
 
   const [isPending, startTransition] = useTransition();
