@@ -13,7 +13,7 @@ export function FooterEcommerce() {
       <div className="container px-4 py-6 md:py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">ShopDash</h3>
+            <h3 className="text-lg font-semibold">E-commerce Admin</h3>
             <p className="text-sm text-muted-foreground">
               Empowering your e-commerce business with intuitive analytics and
               management tools.
@@ -82,7 +82,7 @@ export function FooterEcommerce() {
         <Separator className="my-6" />
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-sm text-muted-foreground">
-            © 2024 ShopDash. All rights reserved.
+            © 2024 E-commerce Admin. All rights reserved.
           </p>
           <nav>
             <ul className="flex space-x-4">

@@ -267,8 +267,6 @@ const ImageDisplay = ({ images }: { images: { url: string }[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastIndex, setLastIndex] = useState(3);
 
-  console.log(images[currentIndex]?.url);
-
   //reset indexes if images change
   useEffect(() => {
     setFirstIndex(0);

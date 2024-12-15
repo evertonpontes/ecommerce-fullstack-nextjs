@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import { Attribute, Category } from '@prisma/client';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { formSchema, ProductForm } from './form-components/product-form';
 import { z } from 'zod';
 
@@ -20,7 +20,7 @@ export const ProductClient: React.FC<ProductClientProps> = ({
 }) => {
   const route = useRouter();
 
-  const [isPending, startTransition] = useTransition();
+  const [isMounted, setIsMounted] = useState(false);
   const [data, setData] = useState<DataType | undefined>(undefined);
   const [categories, setCategories] = useState<
     ({ attributes: Attribute[] } & Category)[]
@@ -51,15 +51,15 @@ export const ProductClient: React.FC<ProductClientProps> = ({
   };
 
   useEffect(() => {
-    startTransition(() => {
-      setTimeout(async () => {
-        if (params === 'edit') {
-          const response = await fetchDataById();
-          setData(response);
-        }
-        fetchAllCategories();
-      }, 1000);
-    });
+    setTimeout(async () => {
+      if (params === 'edit') {
+        const response = await fetchDataById();
+        setData(response);
+      }
+      fetchAllCategories();
+    }, 1000);
+
+    setIsMounted(true);
   }, [fetchDataById, params]);
 
   const header = {
@@ -69,9 +69,11 @@ export const ProductClient: React.FC<ProductClientProps> = ({
       : 'Add a new product to your store.',
   };
 
+  if (params === 'edit' && !data) return null;
+
   return (
     <div className="space-y-4 px-2 sm:px-8 pb-4">
-      {!isPending ? (
+      {isMounted ? (
         <>
           <PageHeader title={header.title} description={header.description} />
           <ProductForm categories={categories} data={data} />
