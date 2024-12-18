@@ -10,7 +10,7 @@ generator client {
 }
 
 model Attribute {
-  id   String @id @default(cuid())
+  id   String @id @default(uuid())
   name String
 
   category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -19,7 +19,7 @@ model Attribute {
 }
 
 model Category {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   name      String
   slug      String   @unique
   createdAt DateTime @default(now())
@@ -45,7 +45,7 @@ enum ProductType {
 }
 
 model Product {
-  id                 String      @id @default(cuid())
+  id                 String      @id @default(uuid())
   name               String
   sku                String      @unique
   description        String
@@ -76,7 +76,7 @@ model Product {
 }
 
 model ProductImage {
-  id  String @id @default(cuid())
+  id  String @id @default(uuid())
   url String
 
   Product Product @relation(fields: [productId], references: [id])
@@ -87,7 +87,7 @@ model ProductImage {
 }
 
 model Variation {
-  id   String @id @default(cuid())
+  id   String @id @default(uuid())
   name String
   slug String
 
@@ -101,7 +101,7 @@ model Variation {
 }
 
 model VariationOption {
-  id         String    @id @default(cuid())
+  id         String    @id @default(uuid())
   value      String
   optionSlug String
   swatch     Swatch    @relation(fields: [swatchId], references: [id])
@@ -114,7 +114,7 @@ model VariationOption {
 }
 
 model Swatch {
-  id                 String      @id @default(cuid())
+  id                 String      @id @default(uuid())
   swatchType         SwatchType  @default(TEXT) // COLOR | IMAGE | TEXT
   swatchShape        SwatchShape @default(SQUARE) // CIRCLE | SQUARE
   swatchColor        String?
