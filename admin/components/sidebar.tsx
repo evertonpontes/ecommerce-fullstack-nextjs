@@ -6,7 +6,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
@@ -17,7 +16,6 @@ import {
   ShoppingCart,
   Users,
   SidebarIcon,
-  Table,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -139,7 +137,7 @@ export function Sidebar() {
             <SidebarIcon className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="p-0">
+        <SheetContent side="left" className="p-0" aria-describedby={undefined}>
           <SidebarContent />
         </SheetContent>
       </Sheet>
@@ -150,7 +148,7 @@ export function Sidebar() {
     return (
       <div className="flex h-full w-full flex-col bg-background">
         <div className="p-6 flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <div className="aspect-square size-8 relative">
               <Image
                 src={Logo}
@@ -160,12 +158,14 @@ export function Sidebar() {
               />
             </div>
             <div className="flex flex-col gap-0.5 leading-none">
-              <span className="font-semibold">E-commerce Admin</span>
+              <SheetTitle className="font-semibold">
+                E-commerce Admin
+              </SheetTitle>
               <span className="text-xs text-muted-foreground">
                 Manage your store
               </span>
             </div>
-          </Link>
+          </div>
         </div>
         <ScrollArea className="flex-1">
           <nav className="flex flex-col pt-0 p-4">

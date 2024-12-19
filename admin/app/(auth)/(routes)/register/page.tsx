@@ -5,20 +5,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { SignIn } from '@/components/ui/signin-button';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
+import React from 'react';
+import { RegisterForm } from './components/register-form';
 
-import { SignIn } from '@/components/ui/signin-button';
-import { LoginForm } from './components/login-form';
-
-export default async function LoginPage() {
+export default async function RegisterPage() {
   return (
     <div className="flex flex-col gap-6 text-center">
       <Card>
         <CardHeader>
-          <CardTitle>Welcome back</CardTitle>
+          <CardTitle>Create an account</CardTitle>
           <CardDescription>
-            Login with your Google or Github account
+            Sign up with your Google or GitHub account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -44,11 +44,11 @@ export default async function LoginPage() {
                 Or continue with
               </span>
             </div>
-            <LoginForm />
+            <RegisterForm />
             <div className="text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <a href="/register" className="underline underline-offset-4">
-                Sign up
+              Already have an account?{' '}
+              <a href="/login" className="underline underline-offset-4">
+                Log in
               </a>
             </div>
           </div>
